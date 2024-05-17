@@ -3,24 +3,34 @@ package com.bngarren.algodemo;
 import com.bngarren.algodemo.util.ICell;
 import com.bngarren.algodemo.util.SimpleCell;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<GridAlgoView>> {
 
+    private static final Logger LOGGER = Logger.getLogger(GridAlgoView.class.getName());
+
     private static final int DEFAULT_GRID_SIZE = 10;
     private static final int DEFAULT_CELL_SIZE = 90;
+
 
     protected final int size;
     protected JPanel gridPanel;
 
     protected Map<ICell, CellButton> cells;
+
+    BufferedImage cellOverlayTexture;
 
     public GridAlgoView() {
         this(DEFAULT_GRID_SIZE);
@@ -30,6 +40,17 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<G
         this.size = size;
         cells = new HashMap<>();
         setupGrid();
+
+        // Load cell texture
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("assets/cellOverlayCheckered.png")) {
+            if (is != null) {
+                cellOverlayTexture = ImageIO.read(is);
+            } else {
+                LOGGER.severe("Texture image not found");
+            }
+        } catch (IOException e) {
+            LOGGER.severe("Failed to load texture: " + e.getMessage());
+        }
     }
 
     private void setupGrid() {
@@ -88,6 +109,10 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<G
         return cells;
     }
 
+    /**
+     * A button representing a cell in a grid.
+     * Implements ICell interface to provide row and column information.
+     */
     public class CellButton extends JButton implements ICell, ActionListener {
 
         int row;
@@ -113,20 +138,30 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<G
                         public void focusGained(FocusEvent e) {
                             gac.selectedCell = CellButton.this;
                             gac.updateView();
-
-                            setColors(Color.ORANGE, fg, false);
                         }
 
                         @Override
                         public void focusLost(FocusEvent e) {
                             gac.updateView();
-                            setColors(bg, fg, false);
                         }
                     });
                 }
             });
 
         }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+
+            // Custom background for selected cell
+            if (controller.selectedCell == this) {
+                if (cellOverlayTexture != null) {
+                    g.drawImage(cellOverlayTexture, 0, 0, getWidth(), getHeight(), null);
+                }
+            }
+        }
+
 
         public void setColors(Color bg, Color fg, boolean newDefault) {
             setBackground(bg);

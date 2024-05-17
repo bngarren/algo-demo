@@ -3,10 +3,10 @@ package com.bngarren.algodemo.algos.BFS;
 import com.bngarren.algodemo.GridAlgoController;
 import com.bngarren.algodemo.GridAlgoView;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.concurrent.Future;
 
 public class BFSController extends GridAlgoController<GridAlgoView> {
 
@@ -24,6 +24,7 @@ public class BFSController extends GridAlgoController<GridAlgoView> {
     @Override
     public void run() {
         System.out.println("Running algo!");
+        shouldStep = false;
         algo = new BFS(this);
         algo.execute();
     }
@@ -31,16 +32,16 @@ public class BFSController extends GridAlgoController<GridAlgoView> {
     @Override
     public void step() {
         boolean firstStep = false;
+        shouldStep = true;
         if (algo == null) {
             algo = new BFS(this);
             algo.execute();
             firstStep = true;
         }
-        if (algo.state() == Future.State.RUNNING) {
-            shouldStep = true;
+        if (algo.getState() == SwingWorker.StateValue.STARTED) {
             if (!firstStep) algo.release();
         }
-
+        view.refreshGrid();
     }
 
     @Override

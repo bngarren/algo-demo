@@ -20,10 +20,11 @@ public abstract class GridAlgoController<T extends GridAlgoView> extends Abstrac
             StringBuilder sb = new StringBuilder();
             sb.append("<html>");
             sb.append(selectedCell.getText());
-            sb.append(selectedCell.getBackground());
             sb.append("</html>");
             view.cellDescriptionTextArea.setText(sb.toString());
         }
+
+        view.refreshGrid();
     }
 
     @Override
