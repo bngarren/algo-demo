@@ -6,13 +6,15 @@ import java.awt.event.KeyListener;
 /**
  * Defines a controller that is associated with a specific type of view
  *
- * @param <T> Type of View
+ * @param <V> Type of View
  */
-public interface IAlgoController<T extends IAlgoView<?>> extends ActionListener, KeyListener, Runnable {
+public interface IAlgoController<V extends IAlgoView<?>> extends ActionListener, KeyListener, Runnable {
 
-    void setView(T view);
+    IAlgorithm<?, ?> getAlgorithm();
 
-    T getView();
+    void setView(V view);
+
+    V getView();
 
     void run();
 

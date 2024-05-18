@@ -1,6 +1,7 @@
 package com.bngarren.algodemo.util;
 
-public interface ICell {
+
+public interface IGridLocation {
 
     int row();
 

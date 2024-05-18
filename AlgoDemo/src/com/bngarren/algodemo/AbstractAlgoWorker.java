@@ -60,4 +60,15 @@ public abstract class AbstractAlgoWorker<T, V, C extends IAlgoController<?>> ext
             semaphore.release();
         }
     }
+
+    public void drain() {
+        if (semaphore != null) {
+            semaphore.drainPermits();
+        }
+    }
+
+    public void resume() {
+        semaphore.release();
+    }
+
 }

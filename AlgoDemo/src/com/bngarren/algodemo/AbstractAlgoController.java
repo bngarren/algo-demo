@@ -5,17 +5,44 @@ import javax.swing.*;
 /**
  * Provides a generic way to associate the controller with a specific view
  *
- * @param <T> Type of View
+ * @param <V> Type of View
  */
-public abstract class AbstractAlgoController<T extends IAlgoView<?>> implements IAlgoController<T> {
+public abstract class AbstractAlgoController<V extends IAlgoView<?>> implements IAlgoController<V> {
 
-    protected T view;
+    protected IAlgorithm<?, ?> algo;
+    protected V view;
     protected boolean shouldStep;
+    protected int stepCount = 0;
 
     public AbstractAlgoController() {
         super();
+        algo = getAlgorithm();
         this.shouldStep = false;
-        SwingUtilities.invokeLater(this::setup);
+    }
+
+    @Override
+    public void run() {
+        System.out.println("Running algo!");
+        shouldStep = false;
+        algo.reset();
+        algo.getWorker().execute();
+    }
+
+    /**
+     * Ensure that super is called if you override!
+     */
+    @Override
+    public void step() {
+        boolean firstStep = stepCount == 0;
+        shouldStep = true;
+
+        algo.getWorker().execute();
+
+        if (algo.getWorker().getState() == SwingWorker.StateValue.STARTED) {
+            if (!firstStep) algo.getWorker().release();
+        }
+
+        stepCount++;
     }
 
     @Override
@@ -24,12 +51,12 @@ public abstract class AbstractAlgoController<T extends IAlgoView<?>> implements 
     }
 
     @Override
-    public T getView() {
+    public V getView() {
         return view;
     }
 
     @Override
-    public void setView(T view) {
+    public void setView(V view) {
         this.view = view;
     }
 }

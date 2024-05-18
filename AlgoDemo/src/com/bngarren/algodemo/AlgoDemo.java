@@ -65,6 +65,8 @@ public class AlgoDemo extends JFrame {
         C controller = controllerFactory.get();
         controller.setView(view);
         view.setController(controller);
+        controller.setup();
+        view.onControllerReady(controller);
         addAlgoView(view);
     }
 

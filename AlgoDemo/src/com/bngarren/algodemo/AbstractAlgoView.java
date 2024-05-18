@@ -8,8 +8,9 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
 
     protected JPanel rootPanel;
     protected JPanel eastPanel;
-    protected JTextArea cellDescriptionTextArea;
-    protected JTextArea algoDescriptionTextArea;
+
+    protected JTextArea cellDescriptionText;
+    protected JTextArea algoDescriptionText;
     protected JButton runButton;
     protected JButton stepButton;
     protected T controller;
@@ -23,16 +24,16 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
         eastPanel.setPreferredSize(new Dimension(400, 0));
         eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.Y_AXIS));
 
-        cellDescriptionTextArea = new JTextArea();
-        cellDescriptionTextArea.setEditable(false);
-        JScrollPane cellScrollPane = new JScrollPane(cellDescriptionTextArea);
+        cellDescriptionText = new JTextArea();
+        cellDescriptionText.setEditable(false);
+        JScrollPane cellScrollPane = new JScrollPane(cellDescriptionText);
         cellScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         cellScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        algoDescriptionTextArea = new JTextArea();
-        algoDescriptionTextArea.setEditable(false);
-        algoDescriptionTextArea.setText(getDescription());
-        JScrollPane algoScrollPane = new JScrollPane(algoDescriptionTextArea);
+        algoDescriptionText = new JTextArea();
+        algoDescriptionText.setEditable(false);
+        algoDescriptionText.setText(getDescription());
+        JScrollPane algoScrollPane = new JScrollPane(algoDescriptionText);
         algoScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         algoScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -71,6 +72,26 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
         rootPanel.addKeyListener(controller);
     }
 
+    @Override
+    public void onControllerReady(T controller) {
+        // NO OP
+    }
+
     protected abstract String getDescription();
 
+    public String getCellDescriptionText() {
+        return cellDescriptionText.getText();
+    }
+
+    public void setCellDescriptionText(String cellDescriptionText) {
+        this.cellDescriptionText.setText(cellDescriptionText);
+    }
+
+    public String getAlgoDescriptionText() {
+        return algoDescriptionText.getText();
+    }
+
+    public void setAlgoDescriptionText(String algoDescriptionText) {
+        this.algoDescriptionText.setText(algoDescriptionText);
+    }
 }

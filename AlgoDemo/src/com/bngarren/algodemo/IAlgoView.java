@@ -14,4 +14,6 @@ public interface IAlgoView<T extends IAlgoController<?>> {
     JPanel getRootPanel();
 
     void setController(T controller);
+
+    void onControllerReady(T controller);
 }

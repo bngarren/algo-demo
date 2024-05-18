@@ -2,7 +2,7 @@ package com.bngarren.algodemo.util;
 
 import java.util.Objects;
 
-public record SimpleCell(int row, int col) implements ICell {
+public record SimpleCell(int row, int col) implements IGridLocation {
 
     @Override
     public int hashCode() {
@@ -14,7 +14,7 @@ public record SimpleCell(int row, int col) implements ICell {
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof ICell other)) {
+        if (!(obj instanceof IGridLocation other)) {
             return false;
         }
         return this.row == other.row() && this.col == other.col();

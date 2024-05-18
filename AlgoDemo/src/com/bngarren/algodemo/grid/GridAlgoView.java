@@ -1,7 +1,8 @@
-package com.bngarren.algodemo;
+package com.bngarren.algodemo.grid;
 
-import com.bngarren.algodemo.util.ICell;
-import com.bngarren.algodemo.util.SimpleCell;
+import com.bngarren.algodemo.AbstractAlgoView;
+import com.bngarren.algodemo.util.GridLocation;
+import com.bngarren.algodemo.util.IGridLocation;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -17,29 +18,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<GridAlgoView>> {
+public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> {
 
     private static final Logger LOGGER = Logger.getLogger(GridAlgoView.class.getName());
 
-    private static final int DEFAULT_GRID_SIZE = 10;
     private static final int DEFAULT_CELL_SIZE = 90;
 
-
-    protected final int size;
     protected JPanel gridPanel;
 
-    protected Map<ICell, CellButton> cells;
+    protected Map<IGridLocation, CellButton> cellButtons;
 
     BufferedImage cellOverlayTexture;
 
     public GridAlgoView() {
-        this(DEFAULT_GRID_SIZE);
-    }
-
-    public GridAlgoView(int size) {
-        this.size = size;
-        cells = new HashMap<>();
-        setupGrid();
+        cellButtons = new HashMap<>();
 
         // Load cell texture
         try (InputStream is = getClass().getClassLoader().getResourceAsStream("assets/cellOverlayCheckered.png")) {
@@ -53,39 +45,63 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<G
         }
     }
 
+    @Override
+    public void onControllerReady(GridAlgoController controller) {
+        super.onControllerReady(controller);
+        setupGrid();
+    }
+
     private void setupGrid() {
+
+        if (controller == null) {
+            LOGGER.warning("Cannot setupGrid before controller is added/initialized.");
+            return;
+        }
+
         gridPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(1, 1, 1, 1); // Add some space between buttons
 
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                SimpleCell cell = new SimpleCell(i, j);
-                GridAlgoView.CellButton cellButton = new GridAlgoView.CellButton(i, j, DEFAULT_CELL_SIZE);
-                cellButton.addActionListener(cellButton);
-                cells.put(cell, cellButton);
-                gbc.gridx = j;
-                gbc.gridy = i;
-                gridPanel.add(cellButton, gbc);
-            }
+        for (Cell cell : controller.getCells().values()) {
+            int row = cell.row();
+            int col = cell.col();
+            GridAlgoView.CellButton cellButton = new GridAlgoView.CellButton(cell, DEFAULT_CELL_SIZE);
+            cellButton.addActionListener(cellButton);
+            cellButtons.put(cell.toGridLocation(), cellButton);
+            gbc.gridx = col;
+            gbc.gridy = row;
+            gridPanel.add(cellButton, gbc);
         }
+
         rootPanel.add(gridPanel, BorderLayout.CENTER);
+
+        System.out.printf("GridAlgoView: cellButtons have been initialized! (size %d)%n", cellButtons.size());
 
         SwingUtilities.invokeLater(this::resizeCells);
 
     }
 
     private void resizeCells() {
+
+        if (controller == null) {
+            LOGGER.warning("Cannot setupGrid before controller is added/initialized.");
+            return;
+        }
+
+        if (controller.getSize() == 0) {
+            return;
+        }
+
         Dimension parentSize = rootPanel.getSize();
         if (parentSize.width == 0 || parentSize.height == 0) {
             return; // Skip resize if the parent size is not yet determined
         }
-        int maxCellSizeWidth = parentSize.width / size;
-        int maxCellSizeHeight = parentSize.height / size;
+        int maxCellSizeWidth = parentSize.width / controller.getSize();
+        int maxCellSizeHeight = parentSize.height / controller.getSize();
         int cellSize = Math.min(DEFAULT_CELL_SIZE, Math.min(maxCellSizeWidth, maxCellSizeHeight) - 10);
 
-        for (CellButton cellButton : cells.values()) {
+        for (CellButton cellButton : cellButtons.values()) {
             cellButton.setCellSize(cellSize);
         }
         gridPanel.revalidate();
@@ -97,46 +113,40 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<G
         gridPanel.repaint();
     }
 
-    public CellButton getCell(int row, int col) {
-        return cells.get(new SimpleCell(row, col));
+    public CellButton getCellButton(int row, int col) {
+        return cellButtons.get(GridLocation.of(row, col));
     }
 
-    public void setCell(int row, int col, CellButton cellButton) {
-        cells.put(new SimpleCell(row, col), cellButton);
-    }
-
-    public Map<ICell, CellButton> getCells() {
-        return cells;
+    public Map<IGridLocation, CellButton> getCellButtons() {
+        return cellButtons;
     }
 
     /**
      * A button representing a cell in a grid.
      * Implements ICell interface to provide row and column information.
      */
-    public class CellButton extends JButton implements ICell, ActionListener {
+    public class CellButton extends JButton implements IGridLocation, ActionListener {
 
-        int row;
-        int col;
+        Cell cell;
         int cellSize;
         Color bg = Color.WHITE;
         Color fg = Color.BLACK;
 
-        public CellButton(int row, int col, int cellSize) {
-            this.row = row;
-            this.col = col;
+        public CellButton(Cell cell, int cellSize) {
+            this.cell = cell;
             setCellSize(cellSize);
             setColors(bg, fg, true);
-            setText(String.format("(%d,%d)", row, col));
+            setText(String.format("(%d,%d)", cell.row(), cell.col()));
             setOpaque(true);
             setBorderPainted(false);
             setFocusPainted(false);
 
             SwingUtilities.invokeLater(() -> {
-                if (controller instanceof GridAlgoController<?> gac) {
+                if (controller instanceof GridAlgoController gac) {
                     addFocusListener(new FocusListener() {
                         @Override
                         public void focusGained(FocusEvent e) {
-                            gac.selectedCell = CellButton.this;
+                            gac.selectedGridLocation = cell.toGridLocation();
                             gac.updateView();
                         }
 
@@ -155,7 +165,7 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<G
             super.paintComponent(g);
 
             // Custom background for selected cell
-            if (controller.selectedCell == this) {
+            if (controller.selectedGridLocation != null && controller.selectedGridLocation.equals(cell.toGridLocation())) {
                 if (cellOverlayTexture != null) {
                     g.drawImage(cellOverlayTexture, 0, 0, getWidth(), getHeight(), null);
                 }
@@ -182,7 +192,7 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<G
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.printf("Button action @ (%d,%d), cellSize=%d %n", this.row, this.col, this.cellSize);
+            System.out.printf("Button action @ (%d,%d), cellSize=%d %n", row(), col(), this.cellSize);
         }
 
         @Override
@@ -203,12 +213,12 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<G
 
         @Override
         public int row() {
-            return row;
+            return cell.row();
         }
 
         @Override
         public int col() {
-            return col;
+            return cell.col();
         }
     }
 }
