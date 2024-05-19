@@ -55,7 +55,7 @@ public abstract class AbstractAlgoWorker<T, V, C extends IAlgoController<?>> ext
     /**
      * Handles each chunk of type V published from the doInBackground() method (worker thread)
      *
-     * @param chunk Object returns from publish()
+     * @param chunk Object passed to publish()
      */
     protected abstract void processChunk(V chunk);
 

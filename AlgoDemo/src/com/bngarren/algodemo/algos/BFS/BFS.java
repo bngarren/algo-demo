@@ -43,7 +43,8 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
         return result;
     }
 
-    public record WorkerPacket(IGridLocation current, List<IGridLocation> neighbors) {
+    public record WorkerPacket(IGridLocation current, List<IGridLocation> neighbors, List<IGridLocation> visited,
+                               List<IGridLocation> queue) {
 
     }
 
@@ -80,8 +81,9 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
                     }
                 }
 
-                // Publish intermediate result (current node + traversable neighbors)
-                publish(new WorkerPacket(current, neighborLocations));
+                // Publish intermediate result
+                publish(new WorkerPacket(current, neighborLocations, visited.stream().toList(), queue.stream()
+                        .toList()));
 
                 if (shouldStep) {
                     semaphore.acquire();
@@ -93,22 +95,41 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
 
         @Override
         protected void processChunk(WorkerPacket packet) {
-            if (controller instanceof BFSController c) {
 
-                IGridLocation current = packet.current();
-                List<IGridLocation> neighbors = packet.neighbors();
+            controller.resetCellButtonColorsToDefault();
 
-                // update current
-                c.getView().getCellButton(current.row(), current.col()).setColors(Color.GRAY, Color.BLACK, false);
+            IGridLocation current = packet.current();
+            List<IGridLocation> neighbors = packet.neighbors();
+            List<IGridLocation> visited = packet.visited();
+            List<IGridLocation> queue = packet.queue();
 
-                // update neighbors
-                for (IGridLocation neighbor : neighbors) {
-                    c.getView()
-                            .getCellButton(neighbor.row(), neighbor.col())
-                            .setColors(Color.YELLOW, Color.BLACK, false);
-                }
-
+            // update visited
+            for (IGridLocation v : visited) {
+                controller.updateCellButton(v, cellButton -> {
+                    cellButton.setColors(Color.GRAY, Color.BLACK, false);
+                });
             }
+
+            // update queue
+            for (IGridLocation q : queue) {
+                controller.updateCellButton(q, cellButton -> {
+                    cellButton.setColors(Color.PINK, Color.BLACK, false);
+                });
+            }
+
+            // update current
+            controller.updateCellButton(current, cellButton -> {
+                cellButton.setColors(Color.BLUE, Color.WHITE, false);
+            });
+
+            // update neighbors
+            for (IGridLocation neighbor : neighbors) {
+                controller.updateCellButton(neighbor, cellButton -> {
+                    cellButton.setColors(Color.CYAN, Color.BLACK, false);
+                });
+            }
+
+
         }
     }
 }

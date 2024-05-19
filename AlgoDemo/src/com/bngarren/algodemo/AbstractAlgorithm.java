@@ -43,4 +43,11 @@ public abstract class AbstractAlgorithm<W extends AbstractAlgoWorker<?, ?, C>, C
      * </pre>
      */
     protected abstract W createWorker();
+
+    /**
+     * Marker interface for worker packets.
+     */
+    public interface WorkerPacket {
+        // This interface can be extended by specific algorithm implementations to define their worker packets
+    }
 }

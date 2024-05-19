@@ -190,6 +190,13 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
             }
         }
 
+        /**
+         * Sets this CellButton's background and foreground colors back to default
+         */
+        public void resetColorsToDefault() {
+            setColors(bg, fg, false);
+        }
+
         public void setCellSize(int cellSize) {
             this.cellSize = cellSize;
             setMinimumSize(new Dimension(cellSize, cellSize));

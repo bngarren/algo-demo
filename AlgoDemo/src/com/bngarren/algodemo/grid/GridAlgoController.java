@@ -6,6 +6,7 @@ import com.bngarren.algodemo.util.IGridLocation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 public abstract class GridAlgoController extends AbstractAlgoController<GridAlgoView> {
@@ -51,6 +52,24 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
         }
 
         view.refreshGrid();
+    }
+
+    public void updateCellButton(IGridLocation gridLoc, Consumer<GridAlgoView.CellButton> updater) {
+        GridAlgoView.CellButton cellButton = view.getCellButton(gridLoc.row(), gridLoc.col());
+        if (cellButton == null) {
+            System.out.println("GridAlgoController: Cannot update, cellButton is null @ " + gridLoc);
+            return;
+        }
+        updater.accept(cellButton);
+    }
+
+    /**
+     * Resets each {@linkplain com.bngarren.algodemo.grid.GridAlgoView.CellButton CellButton} in the {@link GridAlgoView} to its default color scheme.
+     * <p>
+     * For example, this can be called during the running of an algorithm to reset the colors prior to applying new colors to specific CellButtons depending on the algorithm state
+     */
+    public void resetCellButtonColorsToDefault() {
+        view.getCellButtons().values().forEach(GridAlgoView.CellButton::resetColorsToDefault);
     }
 
     public Map<IGridLocation, Cell> getCells() {
