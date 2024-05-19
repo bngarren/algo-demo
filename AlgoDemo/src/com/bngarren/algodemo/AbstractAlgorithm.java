@@ -32,7 +32,7 @@ public abstract class AbstractAlgorithm<W extends AbstractAlgoWorker<?, ?, C>, C
     }
 
     /**
-     * Implemented by concrete class in order to supply a specific {@link AbstractAlgoWorker}
+     * Implemented by concrete algorithm class in order to supply a specific {@link AbstractAlgoWorker}
      *
      * <pre>{@code
      * @Override

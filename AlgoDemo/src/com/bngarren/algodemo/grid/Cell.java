@@ -27,6 +27,14 @@ public class Cell implements IGridLocation {
         return col;
     }
 
+    public boolean isAt(int row, int col) {
+        return this.row == row && this.col == col;
+    }
+
+    public boolean isAt(IGridLocation gridLoc) {
+        return isAt(gridLoc.row(), gridLoc.col());
+    }
+
     public boolean isTraversable() {
         return traversable;
     }

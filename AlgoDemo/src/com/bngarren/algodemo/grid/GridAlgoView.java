@@ -78,7 +78,7 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
             return;
         }
 
-        if (controller.getSize() == 0) {
+        if (controller.getMaxGridDimension() == 0) {
             return;
         }
 
@@ -86,8 +86,8 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
         if (parentSize.width == 0 || parentSize.height == 0) {
             return; // Skip resize if the parent size is not yet determined
         }
-        int maxCellSizeWidth = parentSize.width / controller.getSize();
-        int maxCellSizeHeight = parentSize.height / controller.getSize();
+        int maxCellSizeWidth = parentSize.width / controller.getMaxGridDimension();
+        int maxCellSizeHeight = parentSize.height / controller.getMaxGridDimension();
         int cellSize = Math.min(DEFAULT_CELL_SIZE, Math.min(maxCellSizeWidth, maxCellSizeHeight) - 10);
 
         for (CellButton cellButton : cellButtons.values()) {

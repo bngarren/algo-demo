@@ -14,13 +14,19 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
     private static final Logger LOGGER = Logger.getLogger(GridAlgoController.class.getName());
 
     protected Map<IGridLocation, Cell> cells;
-    protected int size = 0;
+    /**
+     * The greatest of the length of rows and length of cols. Used to render the grid view
+     */
+    protected int maxGridDimension = 0;
     protected IGridLocation selectedGridLocation;
 
     public GridAlgoController() {
         this.cells = new HashMap<>();
     }
 
+    /**
+     * Implement this method to build the grid, updating the {@link #cells} map.
+     */
     protected abstract void initializeCells();
 
     @Override
@@ -80,22 +86,19 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
         return cells.get(GridLocation.of(row, col));
     }
 
-    public int getSize() {
+    public int getMaxGridDimension() {
         if (cells.isEmpty()) return 0;
 
         // Return the cached size
-        if (size != 0) return size;
+        if (maxGridDimension != 0) return maxGridDimension;
 
         // Otherwise calculate
-        int newSize = (int) cells.keySet().stream().filter(k -> k.row() == 0).count();
+        int maxRow = cells.keySet().stream().mapToInt(IGridLocation::row).max().orElse(0);
+        int maxCol = cells.keySet().stream().mapToInt(IGridLocation::col).max().orElse(0);
 
-        // sanity check
-        if (Math.sqrt(cells.keySet().size()) != newSize) {
-            LOGGER.warning(String.format("Row count %d does not match total size of %d for a square grid", newSize, cells.keySet()
-                    .size()));
-        }
-        size = newSize;
-        return newSize;
+        maxGridDimension = Math.max(maxRow, maxCol) + 1; // account for zero-based index
+        System.out.printf("GridAlgoController: maxGridDimension is %d%n", maxGridDimension);
+        return maxGridDimension;
     }
 
 }
