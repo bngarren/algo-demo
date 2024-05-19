@@ -4,6 +4,13 @@ import javax.swing.*;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
+/**
+ * Handles the execution of an algorithm. This class is a subclass of {@link SwingWorker} so that the algorithm executes in a worker thread and publishes updates to the event thread. Additionally, this class holds a {@link Semaphore} field that is used to pause/resume execution of the algorithm at defined points, akin to stepping through with a debugger.
+ *
+ * @param <T> the result type returned by the main execution, i.e. what is returned by the completion of the algorithm
+ * @param <V> the type used for carrying out intermediate results by the publish/process method (see {@link SwingWorker})
+ * @param <C> the controller backing this algorithm. The controller contains a 'shouldStep' field that determines if the semaphore is engaged
+ */
 public abstract class AbstractAlgoWorker<T, V, C extends IAlgoController<?>> extends SwingWorker<T, V> {
 
     protected final C controller;

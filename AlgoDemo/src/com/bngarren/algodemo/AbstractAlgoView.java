@@ -13,6 +13,7 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
     protected JTextArea algoDescriptionText;
     protected JButton runButton;
     protected JButton stepButton;
+    protected JButton resetButton;
     protected T controller;
 
     public AbstractAlgoView() {
@@ -32,7 +33,7 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
 
         algoDescriptionText = new JTextArea();
         algoDescriptionText.setEditable(false);
-        algoDescriptionText.setText(getDescription());
+        setAlgoDescriptionText(getDescription());
         JScrollPane algoScrollPane = new JScrollPane(algoDescriptionText);
         algoScrollPane.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         algoScrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -56,6 +57,13 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
             controller.step();
         });
         bottomPanel.add(stepButton);
+
+        resetButton = new JButton("Reset");
+        resetButton.setPreferredSize(new Dimension(80, 30));
+        resetButton.addActionListener(e -> {
+            controller.reset();
+        });
+        bottomPanel.add(resetButton);
 
         rootPanel.add(eastPanel, BorderLayout.EAST);
         rootPanel.add(bottomPanel, BorderLayout.SOUTH);

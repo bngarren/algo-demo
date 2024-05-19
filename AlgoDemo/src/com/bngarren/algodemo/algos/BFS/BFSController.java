@@ -37,7 +37,7 @@ public class BFSController extends GridAlgoController {
                 cells.put(GridLocation.of(i, j), new Cell(i, j));
             }
         }
-        System.out.println("BFSController has initialized cells with size " + cells.size());
+        System.out.println("BFSController: cells have initialized cells with size " + cells.size());
     }
 
     @Override
@@ -68,7 +68,7 @@ public class BFSController extends GridAlgoController {
 
     @Override
     public void reset() {
-
+        super.reset();
     }
 
     @Override

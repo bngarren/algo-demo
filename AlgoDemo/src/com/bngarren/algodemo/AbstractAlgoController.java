@@ -28,6 +28,11 @@ public abstract class AbstractAlgoController<V extends IAlgoView<?>> implements 
         algo.getWorker().execute();
     }
 
+    @Override
+    public void reset() {
+        algo.reset();
+    }
+
     /**
      * Ensure that super is called if you override!
      */

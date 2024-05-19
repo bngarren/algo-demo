@@ -27,6 +27,16 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
         initializeCells();
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+
+        // Reset the GridAlgoView
+        view.resetGrid();
+
+        System.out.println("GridAlgoController: Grid reset.");
+    }
+
     protected void updateView() {
         if (view == null) return;
 
@@ -36,9 +46,7 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
         } else {
             @SuppressWarnings("StringBufferReplaceableByString")
             StringBuilder sb = new StringBuilder();
-            sb.append("<html>");
             sb.append(selectedGridLocation);
-            sb.append("</html>");
             view.setCellDescriptionText(sb.toString());
         }
 

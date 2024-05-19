@@ -15,5 +15,21 @@ public interface IAlgoView<T extends IAlgoController<?>> {
 
     void setController(T controller);
 
+    /**
+     * Called after the controller has been added and the controller's setup/initialization is complete. This allows the view to computer and render the GUI based on members of the controller
+     * <p>
+     * This method should be called during the view/constructor creation and setup phase, AFTER the controller initialization is complete:
+     * <pre>{@code
+     * V view = viewFactory.get();
+     * C controller = controllerFactory.get();
+     * controller.setView(view);
+     * view.setController(controller);
+     * controller.setup();
+     * view.onControllerReady(controller); // <-- HERE
+     * }
+     * </pre>
+     *
+     * @param controller The controller backing this view
+     */
     void onControllerReady(T controller);
 }

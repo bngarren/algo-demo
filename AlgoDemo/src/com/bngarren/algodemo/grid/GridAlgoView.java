@@ -25,24 +25,13 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
     private static final int DEFAULT_CELL_SIZE = 90;
 
     protected JPanel gridPanel;
-
     protected Map<IGridLocation, CellButton> cellButtons;
-
     BufferedImage cellOverlayTexture;
 
     public GridAlgoView() {
         cellButtons = new HashMap<>();
 
-        // Load cell texture
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream("assets/cellOverlayCheckered.png")) {
-            if (is != null) {
-                cellOverlayTexture = ImageIO.read(is);
-            } else {
-                LOGGER.severe("Texture image not found");
-            }
-        } catch (IOException e) {
-            LOGGER.severe("Failed to load texture: " + e.getMessage());
-        }
+        loadTextures();
     }
 
     @Override
@@ -76,7 +65,7 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
 
         rootPanel.add(gridPanel, BorderLayout.CENTER);
 
-        System.out.printf("GridAlgoView: cellButtons have been initialized! (size %d)%n", cellButtons.size());
+        System.out.printf("GridAlgoView: cellButtons have been initialized with size %d%n", cellButtons.size());
 
         SwingUtilities.invokeLater(this::resizeCells);
 
@@ -106,6 +95,24 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
         }
         gridPanel.revalidate();
         gridPanel.repaint();
+    }
+
+    private void loadTextures() {
+        // Load cell texture
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("assets/cellOverlayCheckered.png")) {
+            if (is != null) {
+                cellOverlayTexture = ImageIO.read(is);
+            } else {
+                LOGGER.severe("Texture image not found");
+            }
+        } catch (IOException e) {
+            LOGGER.severe("Failed to load texture: " + e.getMessage());
+        }
+    }
+
+    public void resetGrid() {
+        cellButtons.clear();
+        setupGrid();
     }
 
     public void refreshGrid() {
@@ -192,7 +199,7 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.printf("Button action @ (%d,%d), cellSize=%d %n", row(), col(), this.cellSize);
+
         }
 
         @Override

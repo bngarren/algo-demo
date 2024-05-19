@@ -26,7 +26,28 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
         return new Worker(controller);
     }
 
-    public static class Worker extends AbstractAlgoWorker<List<IGridLocation>, List<IGridLocation>, BFSController> {
+    private static List<Cell> getNeighbors(IGridLocation current, Map<IGridLocation, Cell> cells) {
+
+        List<Cell> result = new ArrayList<>();
+        int[][] mvmts = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+
+        for (int[] mvmt : mvmts) {
+            GridLocation next = new GridLocation(current.row() + mvmt[0], current.col() + mvmt[1]);
+            if (cells.containsKey(next)) {
+                Cell neighbor = cells.get(next);
+                if (neighbor.isTraversable()) {
+                    result.add(neighbor);
+                }
+            }
+        }
+        return result;
+    }
+
+    public record WorkerPacket(IGridLocation current, List<IGridLocation> neighbors) {
+
+    }
+
+    public static class Worker extends AbstractAlgoWorker<List<IGridLocation>, WorkerPacket, BFSController> {
 
         public Worker(BFSController controller) {
             super(controller);
@@ -47,17 +68,46 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
                 IGridLocation current = queue.poll();
                 result.add(current);
 
+                List<Cell> neighbors = getNeighbors(current, cells);
+                List<IGridLocation> neighborLocations = new ArrayList<>();
+
+                for (Cell neighbor : neighbors) {
+                    GridLocation neighborLoc = neighbor.toGridLocation();
+                    if (!visited.contains(neighborLoc)) {
+                        queue.add(neighborLoc);
+                        visited.add(neighborLoc);
+                        neighborLocations.add(neighborLoc);
+                    }
+                }
+
+                // Publish intermediate result (current node + traversable neighbors)
+                publish(new WorkerPacket(current, neighborLocations));
+
+                if (shouldStep) {
+                    semaphore.acquire();
+                }
             }
 
             return result;
         }
 
         @Override
-        protected void processChunk(List<IGridLocation> chunk) {
+        protected void processChunk(WorkerPacket packet) {
             if (controller instanceof BFSController c) {
-                for (IGridLocation gridLoc : chunk) {
-                    c.getView().getCellButton(gridLoc.row(), gridLoc.col()).setColors(Color.YELLOW, Color.BLACK, false);
+
+                IGridLocation current = packet.current();
+                List<IGridLocation> neighbors = packet.neighbors();
+
+                // update current
+                c.getView().getCellButton(current.row(), current.col()).setColors(Color.GRAY, Color.BLACK, false);
+
+                // update neighbors
+                for (IGridLocation neighbor : neighbors) {
+                    c.getView()
+                            .getCellButton(neighbor.row(), neighbor.col())
+                            .setColors(Color.YELLOW, Color.BLACK, false);
                 }
+
             }
         }
     }
