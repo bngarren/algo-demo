@@ -1,6 +1,8 @@
 package com.bngarren.algodemo;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 
 /**
  * Provides a generic way to associate the controller with a specific view
@@ -63,5 +65,30 @@ public abstract class AbstractAlgoController<V extends IAlgoView<?>> implements 
     @Override
     public void setView(V view) {
         this.view = view;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+
+        switch (e.getKeyCode()) {
+            case KeyEvent.VK_SPACE -> run();
+            case KeyEvent.VK_PERIOD -> step();
+            case KeyEvent.VK_R -> reset();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+
     }
 }

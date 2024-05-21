@@ -18,6 +18,7 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
      * The greatest of the length of rows and length of cols. Used to render the grid view
      */
     protected int maxGridDimension = 0;
+
     protected IGridLocation selectedGridLocation;
 
     public GridAlgoController() {
@@ -99,6 +100,22 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
         maxGridDimension = Math.max(maxRow, maxCol) + 1; // account for zero-based index
         System.out.printf("GridAlgoController: maxGridDimension is %d%n", maxGridDimension);
         return maxGridDimension;
+    }
+
+    public IGridLocation getSelectedGridLocation() {
+        return selectedGridLocation;
+    }
+
+    public void setSelectedGridLocation(IGridLocation selectedGridLocation) {
+        this.selectedGridLocation = selectedGridLocation;
+        updateView();
+    }
+
+    /**
+     * Requests focus for the CellButton at the given grid location
+     */
+    public void focusCellAt(IGridLocation gridLoc) {
+        view.getCellButton(gridLoc.row(), gridLoc.col()).requestFocus();
     }
 
 }

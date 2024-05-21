@@ -8,8 +8,6 @@ import com.bngarren.algodemo.util.IGridLocation;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -36,6 +34,8 @@ public class BFSController extends GridAlgoController {
     protected void initializeCells() {
 
         Set<IGridLocation> nonTraversable = new HashSet<>();
+        nonTraversable.add(GridLocation.of(2, 0));
+        nonTraversable.add(GridLocation.of(2, 1));
         nonTraversable.add(GridLocation.of(2, 2));
         nonTraversable.add(GridLocation.of(2, 3));
         nonTraversable.add(GridLocation.of(2, 4));
@@ -74,12 +74,12 @@ public class BFSController extends GridAlgoController {
 
                 // START CELL
                 updateCellButton(GridLocation.of(0, 0), cellButton -> {
-                    cellButton.setColors(START_CELL_BG_COLOR, START_CELL_FG_COLOR, true);
+                    cellButton.setDefaultColors(START_CELL_BG_COLOR, START_CELL_FG_COLOR, true);
                 });
 
                 // END CELL
                 updateCellButton(GridLocation.of(GRID_SIZE - 1, GRID_SIZE - 1), cellButton -> {
-                    cellButton.setColors(END_CELL_BG_COLOR, END_CELL_FG_COLOR, true);
+                    cellButton.setDefaultColors(END_CELL_BG_COLOR, END_CELL_FG_COLOR, true);
                 });
 
                 // NON-TRAVERSABLE CELLS
@@ -87,7 +87,7 @@ public class BFSController extends GridAlgoController {
                         .stream()
                         .filter(c -> !c.isTraversable())
                         .forEach(nt -> updateCellButton(nt, cellButton -> {
-                            cellButton.setColors(Color.BLACK, Color.WHITE, true);
+                            cellButton.setDefaultColors(Color.BLACK, Color.WHITE, true);
                         }));
 
                 view.refreshGrid();
@@ -107,23 +107,5 @@ public class BFSController extends GridAlgoController {
         initializeCellButtons();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
 
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
-    }
 }

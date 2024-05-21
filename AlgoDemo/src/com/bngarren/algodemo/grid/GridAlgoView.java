@@ -93,8 +93,8 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
         for (CellButton cellButton : cellButtons.values()) {
             cellButton.setCellSize(cellSize);
         }
-        gridPanel.revalidate();
-        gridPanel.repaint();
+
+        refreshGrid();
     }
 
     private void loadTextures() {
@@ -111,10 +111,14 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
     }
 
     public void resetGrid() {
+        gridPanel.removeAll();
         cellButtons.clear();
         setupGrid();
     }
 
+    /**
+     * Revalidate and repaint
+     */
     public void refreshGrid() {
         gridPanel.revalidate();
         gridPanel.repaint();
@@ -136,13 +140,14 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
 
         Cell cell;
         int cellSize;
-        Color bg = Color.WHITE;
-        Color fg = Color.BLACK;
+
+        Color defaultBg = Color.WHITE;
+        Color defaultFg = Color.BLACK;
 
         public CellButton(Cell cell, int cellSize) {
             this.cell = cell;
             setCellSize(cellSize);
-            setColors(bg, fg, true);
+            setCurrentColors(defaultBg, defaultFg);
             setText(String.format("(%d,%d)", cell.row(), cell.col()));
             setOpaque(true);
             setBorderPainted(false);
@@ -153,8 +158,7 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
                     addFocusListener(new FocusListener() {
                         @Override
                         public void focusGained(FocusEvent e) {
-                            gac.selectedGridLocation = cell.toGridLocation();
-                            gac.updateView();
+                            gac.setSelectedGridLocation(cell.toGridLocation());
                         }
 
                         @Override
@@ -179,22 +183,25 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
             }
         }
 
+        public void setDefaultColors(Color bg, Color fg, boolean updateCurrent) {
+            this.defaultBg = bg;
+            this.defaultFg = fg;
+            if (updateCurrent) {
+                setCurrentColors(bg, fg);
+            }
+        }
 
-        public void setColors(Color bg, Color fg, boolean newDefault) {
+
+        public void setCurrentColors(Color bg, Color fg) {
             setBackground(bg);
             setForeground(fg);
-
-            if (newDefault) {
-                this.bg = bg;
-                this.fg = fg;
-            }
         }
 
         /**
          * Sets this CellButton's background and foreground colors back to default
          */
         public void resetColorsToDefault() {
-            setColors(bg, fg, false);
+            setCurrentColors(defaultBg, defaultFg);
         }
 
         public void setCellSize(int cellSize) {

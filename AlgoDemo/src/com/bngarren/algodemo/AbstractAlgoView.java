@@ -3,12 +3,16 @@ package com.bngarren.algodemo;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements IAlgoView<T> {
 
+    protected static final int EAST_PANEL_WIDTH = 400;
+    protected static final int BUTTON_WIDTH = 120;
+    protected static final int BUTTON_HEIGHT = 40;
+
     protected JPanel rootPanel;
     protected JPanel eastPanel;
-
     protected JTextArea cellDescriptionText;
     protected JTextArea algoDescriptionText;
     protected JButton runButton;
@@ -17,12 +21,20 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
     protected T controller;
 
     public AbstractAlgoView() {
+        initializeRootPanel();
+        initializeEastPanel();
+        initializeBottomPanel();
+    }
+
+    private void initializeRootPanel() {
         rootPanel = new JPanel(new BorderLayout());
         rootPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+    }
 
+    private void initializeEastPanel() {
         // Setup East panel with preferred size
         eastPanel = new JPanel();
-        eastPanel.setPreferredSize(new Dimension(400, 0));
+        eastPanel.setPreferredSize(new Dimension(EAST_PANEL_WIDTH, 0));
         eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.Y_AXIS));
 
         cellDescriptionText = new JTextArea();
@@ -42,32 +54,29 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
         eastPanel.add(Box.createVerticalStrut(10)); // Add some space between components
         eastPanel.add(algoScrollPane);
 
-        // Bottom Panel
+        rootPanel.add(eastPanel, BorderLayout.EAST);
+    }
+
+    private void initializeBottomPanel() {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        runButton = new JButton("Run");
-        runButton.setPreferredSize(new Dimension(80, 30));
-        runButton.addActionListener(e -> {
-            controller.run();
-        });
+        runButton = createButton("Run [SPACE]", e -> controller.run());
+        stepButton = createButton("Step [.]", e -> controller.step());
+        resetButton = createButton("Reset [R]", e -> controller.reset());
+
         bottomPanel.add(runButton);
-
-        stepButton = new JButton("Step");
-        stepButton.setPreferredSize(new Dimension(80, 30));
-        stepButton.addActionListener(e -> {
-            controller.step();
-        });
         bottomPanel.add(stepButton);
-
-        resetButton = new JButton("Reset");
-        resetButton.setPreferredSize(new Dimension(80, 30));
-        resetButton.addActionListener(e -> {
-            controller.reset();
-        });
         bottomPanel.add(resetButton);
 
-        rootPanel.add(eastPanel, BorderLayout.EAST);
         rootPanel.add(bottomPanel, BorderLayout.SOUTH);
     }
+
+    private JButton createButton(String text, ActionListener actionListener) {
+        JButton button = new JButton(text);
+        button.setPreferredSize(new Dimension(BUTTON_WIDTH, BUTTON_HEIGHT));
+        button.addActionListener(actionListener);
+        return button;
+    }
+
 
     @Override
     public JPanel getRootPanel() {

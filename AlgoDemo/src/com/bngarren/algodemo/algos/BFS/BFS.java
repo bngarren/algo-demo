@@ -106,29 +106,33 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
             // update visited
             for (IGridLocation v : visited) {
                 controller.updateCellButton(v, cellButton -> {
-                    cellButton.setColors(Color.GRAY, Color.BLACK, false);
+                    cellButton.setCurrentColors(Color.GRAY, Color.BLACK);
                 });
             }
 
             // update queue
+            StringBuilder sb = new StringBuilder("Queue\n");
             for (IGridLocation q : queue) {
+                sb.append(q).append("\n");
                 controller.updateCellButton(q, cellButton -> {
-                    cellButton.setColors(Color.PINK, Color.BLACK, false);
+                    cellButton.setCurrentColors(Color.PINK, Color.BLACK);
                 });
             }
 
             // update current
             controller.updateCellButton(current, cellButton -> {
-                cellButton.setColors(Color.BLUE, Color.WHITE, false);
+                cellButton.setCurrentColors(Color.BLUE, Color.WHITE);
             });
+            controller.focusCellAt(current);
 
             // update neighbors
             for (IGridLocation neighbor : neighbors) {
                 controller.updateCellButton(neighbor, cellButton -> {
-                    cellButton.setColors(Color.CYAN, Color.BLACK, false);
+                    cellButton.setCurrentColors(Color.CYAN, Color.BLACK);
                 });
             }
 
+            controller.getView().setAlgoDescriptionText(sb.toString());
 
         }
     }
