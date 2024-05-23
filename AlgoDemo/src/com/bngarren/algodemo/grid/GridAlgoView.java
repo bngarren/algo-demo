@@ -25,7 +25,15 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
     private static final int DEFAULT_CELL_SIZE = 90;
 
     protected JPanel gridPanel;
+
+    /**
+     * {@linkplain CellButton CellButtons} are the UI representation of the logical {@linkplain Cell Cells} that form the grid
+     */
     protected Map<IGridLocation, CellButton> cellButtons;
+
+    /**
+     * Texture applied to the selected Cell
+     */
     BufferedImage cellOverlayTexture;
 
     public GridAlgoView() {
@@ -63,7 +71,8 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
             gridPanel.add(cellButton, gbc);
         }
 
-        rootPanel.add(gridPanel, BorderLayout.CENTER);
+        // Sets the center of the root panel to this grid panel
+        setCenterPanel(gridPanel);
 
         System.out.printf("GridAlgoView: cellButtons have been initialized with size %d%n", cellButtons.size());
 
@@ -82,7 +91,7 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
             return;
         }
 
-        Dimension parentSize = rootPanel.getSize();
+        Dimension parentSize = getRootPanel().getSize();
         if (parentSize.width == 0 || parentSize.height == 0) {
             return; // Skip resize if the parent size is not yet determined
         }

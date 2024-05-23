@@ -11,7 +11,7 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
     protected static final int BUTTON_WIDTH = 120;
     protected static final int BUTTON_HEIGHT = 40;
 
-    protected JPanel rootPanel;
+    private JPanel rootPanel;
     protected JPanel eastPanel;
     protected JTextArea cellDescriptionText;
     protected JTextArea algoDescriptionText;
@@ -92,6 +92,15 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
     @Override
     public void onControllerReady(T controller) {
         // NO OP
+    }
+
+    /**
+     * Sets the CENTER (BorderLayout) of the root panel to the given JPanel
+     *
+     * @param panel JPanel to set in the Center location
+     */
+    public void setCenterPanel(JPanel panel) {
+        rootPanel.add(panel, BorderLayout.CENTER);
     }
 
     protected abstract String getDescription();

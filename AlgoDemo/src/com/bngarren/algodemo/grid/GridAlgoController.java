@@ -13,17 +13,26 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
 
     private static final Logger LOGGER = Logger.getLogger(GridAlgoController.class.getName());
 
+    /**
+     * The logical {@linkplain Cell Cells} backing the grid and algorithm.
+     * <p>
+     * These should be created by implementing {@link #initializeCells()} in a concrete class.
+     */
     protected Map<IGridLocation, Cell> cells;
     /**
      * The greatest of the length of rows and length of cols. Used to render the grid view
      */
     protected int maxGridDimension = 0;
 
+    /**
+     * Holds the {@link IGridLocation} reference of the currently selected grid location (should correspond to a {@link Cell} and {@link com.bngarren.algodemo.grid.GridAlgoView.CellButton}.
+     */
     protected IGridLocation selectedGridLocation;
 
     public GridAlgoController() {
         this.cells = new HashMap<>();
     }
+    
 
     /**
      * Implement this method to build the grid, updating the {@link #cells} map.
