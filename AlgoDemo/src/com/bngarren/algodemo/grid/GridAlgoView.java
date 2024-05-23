@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> {
+public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<?>> {
 
     private static final Logger LOGGER = Logger.getLogger(GridAlgoView.class.getName());
 
@@ -43,8 +43,8 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
     }
 
     @Override
-    public void onControllerReady(GridAlgoController controller) {
-        super.onControllerReady(controller);
+    public void onControllerReady() {
+        super.onControllerReady();
         setupGrid();
     }
 
@@ -119,6 +119,9 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController> 
         }
     }
 
+    /**
+     * Removes/clears grid panel and cell buttons and sets up the grid again
+     */
     public void resetGrid() {
         gridPanel.removeAll();
         cellButtons.clear();

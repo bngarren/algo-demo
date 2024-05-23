@@ -12,14 +12,19 @@ public interface IAlgoController<V extends IAlgoView<?>> extends ActionListener,
 
     IAlgorithm<?, ?> getAlgorithm();
 
-    void setView(V view);
-
     V getView();
 
     void run();
 
     void step();
 
+    /**
+     * Perform tasks to set up the state of the controller and initial state of the algorithm.
+     * <p>
+     * This method should be called during initialization.
+     * <p>
+     * Any task that reads or modifies the view should be called from {@link #prepareView()} instead.
+     */
     void setup();
 
     void reset();

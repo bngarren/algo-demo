@@ -20,6 +20,8 @@ public class AlgoDemo extends JFrame {
     public AlgoDemo() {
         setTitle("AlgoDemo");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // Center the frame on the screen
+        setLocationRelativeTo(null);
 
         try {
 //            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -31,21 +33,14 @@ public class AlgoDemo extends JFrame {
 
         setupFrameDimensions();
 
-        // Center the frame on the screen
-        setLocationRelativeTo(null);
-
         mainLayout = new CardLayout();
         mainPanel = new JPanel(mainLayout);
         setLayout(new BorderLayout());
-
         add(mainPanel, BorderLayout.CENTER);
 
         algoViews = new HashMap<>();
 
-        JMenuBar menuBar = new JMenuBar();
-        JMenu menu = new JMenu("Algorithms");
-        menuBar.add(menu);
-        setJMenuBar(menuBar);
+        setupMenuBar();
 
         // Creates and sets a KeyEventDispatcher for the app. This class will handle intercepting global key events and passing them to a KeyListener, if active. The key listener is typically an IAlgoController, such that each concrete implementation can handle global key events as needed.
         initializeKeyEventDispatcher();
@@ -67,19 +62,25 @@ public class AlgoDemo extends JFrame {
         setSize(frameWidth, frameHeight);
     }
 
+    private void setupMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("Algorithms");
+        menuBar.add(menu);
+        setJMenuBar(menuBar);
+    }
+
     private void initializeKeyEventDispatcher() {
         keyEventDispatcher = new AppKeyEventDispatcher();
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(keyEventDispatcher);
     }
 
     //uses bounded type parameters to ensure that the view and controller are compatible with each other
-    private <V extends IAlgoView<C>, C extends IAlgoController<V>> void addAlgoView(Supplier<V> viewFactory, Supplier<C> controllerFactory) {
-        V view = viewFactory.get();
+    private <V extends IAlgoView<C>, C extends IAlgoController<V>> void addAlgoView(Supplier<C> controllerFactory) {
+
         C controller = controllerFactory.get();
-        controller.setView(view);
+        IAlgoView<C> view = controller.getView();
         view.setController(controller);
         controller.setup();
-        view.onControllerReady(controller);
 
         algoViews.put(view.getTitle(), view);
         mainPanel.add(view.getRootPanel(), view.getTitle());
@@ -104,7 +105,7 @@ public class AlgoDemo extends JFrame {
             AlgoDemo ag = new AlgoDemo();
 
             // Add the algorithms/views/controllers
-            ag.addAlgoView(BFSView::new, BFSController::new);
+            ag.addAlgoView(() -> new BFSController(new BFSView()));
 
             ag.setVisible(true);
         });

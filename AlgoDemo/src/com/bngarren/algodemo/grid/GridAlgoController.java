@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-public abstract class GridAlgoController extends AbstractAlgoController<GridAlgoView> {
+/**
+ * @param <C> Cell, or subclass of Cell, that makes up the grid
+ */
+public abstract class GridAlgoController<C extends Cell> extends AbstractAlgoController<GridAlgoView> {
 
     private static final Logger LOGGER = Logger.getLogger(GridAlgoController.class.getName());
 
@@ -18,7 +21,7 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
      * <p>
      * These should be created by implementing {@link #initializeCells()} in a concrete class.
      */
-    protected Map<IGridLocation, Cell> cells;
+    protected Map<IGridLocation, C> cells;
     /**
      * The greatest of the length of rows and length of cols. Used to render the grid view
      */
@@ -29,20 +32,22 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
      */
     protected IGridLocation selectedGridLocation;
 
-    public GridAlgoController() {
+    public GridAlgoController(GridAlgoView view) {
+        super(view);
         this.cells = new HashMap<>();
     }
-    
+
+    @Override
+    protected void initialize() {
+        initializeCells();
+    }
+
 
     /**
      * Implement this method to build the grid, updating the {@link #cells} map.
      */
     protected abstract void initializeCells();
 
-    @Override
-    public void setup() {
-        initializeCells();
-    }
 
     @Override
     public void reset() {
@@ -50,6 +55,8 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
 
         // Reset the GridAlgoView
         view.resetGrid();
+
+        prepareView();
 
         System.out.println("GridAlgoController: Grid reset.");
     }
@@ -88,11 +95,11 @@ public abstract class GridAlgoController extends AbstractAlgoController<GridAlgo
         view.getCellButtons().values().forEach(GridAlgoView.CellButton::resetColorsToDefault);
     }
 
-    public Map<IGridLocation, Cell> getCells() {
+    public Map<IGridLocation, C> getCells() {
         return cells;
     }
 
-    public Cell getCell(int row, int col) {
+    public C getCell(int row, int col) {
         return cells.get(GridLocation.of(row, col));
     }
 

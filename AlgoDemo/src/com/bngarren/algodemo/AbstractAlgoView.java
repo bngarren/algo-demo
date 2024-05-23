@@ -90,7 +90,7 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
     }
 
     @Override
-    public void onControllerReady(T controller) {
+    public void onControllerReady() {
         // NO OP
     }
 
