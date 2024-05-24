@@ -103,7 +103,7 @@ public abstract class AbstractAlgoView<T extends IAlgoController<?>> implements 
         rootPanel.add(panel, BorderLayout.CENTER);
     }
 
-    protected abstract String getDescription();
+    public abstract String getDescription();
 
     public String getCellDescriptionText() {
         return cellDescriptionText.getText();

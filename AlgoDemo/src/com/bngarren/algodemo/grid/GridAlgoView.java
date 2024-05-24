@@ -1,5 +1,6 @@
 package com.bngarren.algodemo.grid;
 
+import com.bngarren.algodemo.AbstractAlgoController;
 import com.bngarren.algodemo.AbstractAlgoView;
 import com.bngarren.algodemo.util.GridLocation;
 import com.bngarren.algodemo.util.IGridLocation;
@@ -9,8 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -129,7 +128,9 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<?
     }
 
     /**
-     * Revalidate and repaint
+     * Revalidate and repaint <i>only</i> the grid panel.
+     * <p>
+     * Consider calling {@link AbstractAlgoController#refreshView()} if the entire view should be repainted/revalidated.
      */
     public void refreshGrid() {
         gridPanel.revalidate();
@@ -164,23 +165,7 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<?
             setOpaque(true);
             setBorderPainted(false);
             setFocusPainted(false);
-
-            SwingUtilities.invokeLater(() -> {
-                if (controller instanceof GridAlgoController gac) {
-                    addFocusListener(new FocusListener() {
-                        @Override
-                        public void focusGained(FocusEvent e) {
-                            gac.setSelectedGridLocation(cell.toGridLocation());
-                        }
-
-                        @Override
-                        public void focusLost(FocusEvent e) {
-                            gac.updateView();
-                        }
-                    });
-                }
-            });
-
+            addActionListener(this);
         }
 
         @Override
@@ -188,11 +173,13 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<?
             super.paintComponent(g);
 
             // Custom background for selected cell
-            if (controller.selectedGridLocation != null && controller.selectedGridLocation.equals(cell.toGridLocation())) {
-                if (cellOverlayTexture != null) {
-                    g.drawImage(cellOverlayTexture, 0, 0, getWidth(), getHeight(), null);
+            controller.getCurrentSelectedGridLocation().ifPresent(selected -> {
+                if (selected.equals(cell.toGridLocation())) {
+                    if (cellOverlayTexture != null) {
+                        g.drawImage(cellOverlayTexture, 0, 0, getWidth(), getHeight(), null);
+                    }
                 }
-            }
+            });
         }
 
         public void setDefaultColors(Color bg, Color fg, boolean updateCurrent) {
@@ -225,7 +212,7 @@ public abstract class GridAlgoView extends AbstractAlgoView<GridAlgoController<?
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            controller.setSelectedGridLocation(cell.toGridLocation());
         }
 
         @Override

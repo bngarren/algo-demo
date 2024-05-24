@@ -20,6 +20,6 @@ public interface IAlgorithm<W extends AbstractAlgoWorker<?, ?, C>, C extends IAl
      * <p>
      * The next call to {@link #getWorker()} will create a new instance.
      */
-    void reset();
+    void cancel();
 
 }

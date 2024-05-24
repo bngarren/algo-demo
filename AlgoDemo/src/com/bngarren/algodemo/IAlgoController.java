@@ -29,5 +29,10 @@ public interface IAlgoController<V extends IAlgoView<?>> extends ActionListener,
 
     void reset();
 
+    /**
+     * Repaints and revalidates the view associated with this controller.
+     */
+    void refreshView();
+
     boolean shouldStep();
 }

@@ -2,10 +2,12 @@ package com.bngarren.algodemo.grid;
 
 import com.bngarren.algodemo.AbstractAlgoController;
 import com.bngarren.algodemo.util.GridLocation;
+import com.bngarren.algodemo.util.GridLocationHistory;
 import com.bngarren.algodemo.util.IGridLocation;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -28,13 +30,14 @@ public abstract class GridAlgoController<C extends Cell> extends AbstractAlgoCon
     protected int maxGridDimension = 0;
 
     /**
-     * Holds the {@link IGridLocation} reference of the currently selected grid location (should correspond to a {@link Cell} and {@link com.bngarren.algodemo.grid.GridAlgoView.CellButton}.
+     * A {@link GridLocationHistory} object that stores the currently selected and previously selected grid location (should correspond to a {@link Cell} and {@link com.bngarren.algodemo.grid.GridAlgoView.CellButton}.
      */
-    protected IGridLocation selectedGridLocation;
+    protected GridLocationHistory selectedGridLocation;
 
     public GridAlgoController(GridAlgoView view) {
         super(view);
         this.cells = new HashMap<>();
+        this.selectedGridLocation = new GridLocationHistory(2);
     }
 
     @Override
@@ -51,30 +54,32 @@ public abstract class GridAlgoController<C extends Cell> extends AbstractAlgoCon
 
     @Override
     public void reset() {
-        super.reset();
-
-        // Reset the GridAlgoView
+        // Reset the GridAlgoView, i.e. clear the grid and set it up again
         view.resetGrid();
 
-        prepareView();
+        // Clear any selected grid loc and update GUI to reflect this
+        selectedGridLocation.clear();
+        updateView();
 
-        System.out.println("GridAlgoController: Grid reset.");
+        // AbstractAlgoController.reset() will cancel any currently running algo worker and call prepareView()
+        super.reset();
     }
 
     protected void updateView() {
         if (view == null) return;
 
-        if (selectedGridLocation == null) {
-            view.setCellDescriptionText("");
-            view.getRootPanel().transferFocus();
-        } else {
+
+        // Update GUI based on the presence/absence of a selected grid location (selected cell)
+        selectedGridLocation.getCurrent().ifPresentOrElse(selected -> {
             @SuppressWarnings("StringBufferReplaceableByString")
             StringBuilder sb = new StringBuilder();
-            sb.append(selectedGridLocation);
+            sb.append(selected);
             view.setCellDescriptionText(sb.toString());
-        }
+        }, () -> {
+            view.setCellDescriptionText("");
+            view.setAlgoDescriptionText(view.getDescription().isEmpty() ? "" : view.getDescription());
+        });
 
-        view.refreshGrid();
     }
 
     public void updateCellButton(IGridLocation gridLoc, Consumer<GridAlgoView.CellButton> updater) {
@@ -118,12 +123,17 @@ public abstract class GridAlgoController<C extends Cell> extends AbstractAlgoCon
         return maxGridDimension;
     }
 
-    public IGridLocation getSelectedGridLocation() {
-        return selectedGridLocation;
+    public Optional<IGridLocation> getCurrentSelectedGridLocation() {
+        return selectedGridLocation.getCurrent();
+    }
+
+    public Optional<IGridLocation> getPrevSelectedGridLocation() {
+        return selectedGridLocation.getPrevious();
     }
 
     public void setSelectedGridLocation(IGridLocation selectedGridLocation) {
-        this.selectedGridLocation = selectedGridLocation;
+        this.selectedGridLocation.push(selectedGridLocation);
+        this.selectedGridLocation.getPrevious().ifPresent(prev -> view.getCellButton(prev.row(), prev.col()).repaint());
         updateView();
     }
 

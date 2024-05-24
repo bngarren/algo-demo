@@ -61,7 +61,7 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
             HashSet<IGridLocation> visited = new HashSet<>();
             List<IGridLocation> result = new ArrayList<>();
 
-            IGridLocation startCell = cells.get(GridLocation.of(0, 0));
+            IGridLocation startCell = GridLocation.of(0, 0);
             queue.add(startCell);
             visited.add(startCell);
 
@@ -123,7 +123,7 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
             controller.updateCellButton(current, cellButton -> {
                 cellButton.setCurrentColors(Color.BLUE, Color.WHITE);
             });
-            controller.focusCellAt(current);
+            controller.setSelectedGridLocation(current);
 
             // update neighbors
             for (IGridLocation neighbor : neighbors) {

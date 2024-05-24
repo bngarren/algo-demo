@@ -65,7 +65,7 @@ public class BFSController extends GridAlgoController<Cell> {
                         cellButton.setDefaultColors(Color.BLACK, Color.WHITE, true);
                     }));
 
-            view.refreshGrid();
+//            view.refreshGrid();
         }
 
     }

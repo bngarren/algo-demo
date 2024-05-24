@@ -24,7 +24,7 @@ public abstract class AbstractAlgorithm<W extends AbstractAlgoWorker<?, ?, C>, C
     }
 
     @Override
-    public void reset() {
+    public void cancel() {
         if (worker != null) {
             worker.cancel(true);
             worker = null;

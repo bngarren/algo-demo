@@ -3,17 +3,19 @@ package com.bngarren.algodemo.algos.Dijkstra;
 import com.bngarren.algodemo.IAlgorithm;
 import com.bngarren.algodemo.grid.Cell;
 import com.bngarren.algodemo.grid.GridAlgoController;
-import com.bngarren.algodemo.util.GridLocation;
-import com.bngarren.algodemo.util.IGridLocation;
+import com.bngarren.algodemo.util.GridBuilder;
 
-import java.util.HashSet;
+import java.awt.*;
 import java.util.Objects;
-import java.util.Set;
 
-public class DijkstraController extends GridAlgoController {
+public class DijkstraController extends GridAlgoController<Cell> {
 
     private final static int GRID_SIZE = 10;
 
+    public DijkstraController(DijkstraView view) {
+        super(view);
+        registerViewSetupTask(this::initializeCellButtons);
+    }
 
     @Override
     public IAlgorithm<?, ?> getAlgorithm() {
@@ -22,25 +24,27 @@ public class DijkstraController extends GridAlgoController {
 
     @Override
     protected void initializeCells() {
-
-        Set<IGridLocation> nonTraversable = new HashSet<>();
-        nonTraversable.add(GridLocation.of(2, 2));
-        nonTraversable.add(GridLocation.of(2, 3));
-        nonTraversable.add(GridLocation.of(2, 4));
-
-        for (int i = 0; i < GRID_SIZE; i++) {
-            for (int j = 0; j < GRID_SIZE; j++) {
-                Cell cell = new Cell(i, j);
-                if (nonTraversable.contains(cell.toGridLocation())) {
-                    cell.setTraversable(false);
-                }
-                cells.put(GridLocation.of(i, j), cell);
-            }
-        }
+        cells = new GridBuilder<>(GRID_SIZE, Cell::new)
+                .addNonTraversable(2, 0)
+                .addNonTraversable(2, 1)
+                .addNonTraversable(2, 2)
+                .addNonTraversable(2, 3)
+                .addNonTraversable(2, 4)
+                .build();
     }
 
-    @Override
-    protected void initializeCellButtons() {
+    private void initializeCellButtons() {
+        if (view != null && !view.getCellButtons().isEmpty()) {
 
+            // NON-TRAVERSABLE CELLS
+            cells.values()
+                    .stream()
+                    .filter(c -> !c.isTraversable())
+                    .forEach(nt -> updateCellButton(nt, cellButton -> {
+                        cellButton.setDefaultColors(Color.BLACK, Color.WHITE, true);
+                    }));
+
+//            view.refreshGrid();
+        }
     }
 }

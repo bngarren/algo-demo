@@ -2,9 +2,12 @@ package com.bngarren.algodemo;
 
 import com.bngarren.algodemo.algos.BFS.BFSController;
 import com.bngarren.algodemo.algos.BFS.BFSView;
+import com.bngarren.algodemo.algos.Dijkstra.DijkstraController;
+import com.bngarren.algodemo.algos.Dijkstra.DijkstraView;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -20,8 +23,6 @@ public class AlgoDemo extends JFrame {
     public AlgoDemo() {
         setTitle("AlgoDemo");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // Center the frame on the screen
-        setLocationRelativeTo(null);
 
         try {
 //            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -32,6 +33,8 @@ public class AlgoDemo extends JFrame {
         }
 
         setupFrameDimensions();
+        // Center the frame on the screen
+        setLocationRelativeTo(null);
 
         mainLayout = new CardLayout();
         mainPanel = new JPanel(mainLayout);
@@ -87,8 +90,7 @@ public class AlgoDemo extends JFrame {
 
         JMenuItem menuItem = new JMenuItem(view.getTitle());
         menuItem.addActionListener(e -> {
-            mainLayout.show(mainPanel, view.getTitle());
-            keyEventDispatcher.setKeyListener(controller);
+            handleSelectMenuItem(e, view, controller);
         });
         getJMenuBar().getMenu(0).add(menuItem);
 
@@ -99,6 +101,21 @@ public class AlgoDemo extends JFrame {
         }
     }
 
+    private <V extends IAlgoView<C>, C extends IAlgoController<V>> void handleSelectMenuItem(ActionEvent e, IAlgoView<C> view, C controller) {
+        // Show the selected view
+        mainLayout.show(mainPanel, view.getTitle());
+        // Cancel the previous controller's algorithm
+        if (currentAlgoController != null) {
+            currentAlgoController.getAlgorithm().cancel();
+        }
+
+        currentAlgoController = (AbstractAlgoController<?>) controller;
+        currentAlgoController.reset();
+        // Selected controller takes over as global key listener
+        keyEventDispatcher.setKeyListener(controller);
+
+    }
+
     public static void main(String[] args) {
 
         SwingUtilities.invokeLater(() -> {
@@ -106,6 +123,8 @@ public class AlgoDemo extends JFrame {
 
             // Add the algorithms/views/controllers
             ag.addAlgoView(() -> new BFSController(new BFSView()));
+
+            ag.addAlgoView(() -> new DijkstraController(new DijkstraView()));
 
             ag.setVisible(true);
         });

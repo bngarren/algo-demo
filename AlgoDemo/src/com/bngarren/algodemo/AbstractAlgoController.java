@@ -84,16 +84,25 @@ public abstract class AbstractAlgoController<V extends IAlgoView<?>> implements 
     }
 
     @Override
+    public void refreshView() {
+        view.getRootPanel().repaint();
+        view.getRootPanel().revalidate();
+    }
+
+    @Override
     public void run() {
         System.out.println("Running algo!");
         shouldStep = false;
-        algo.reset();
+        algo.cancel();
         algo.getWorker().execute();
     }
 
     @Override
     public void reset() {
-        algo.reset();
+        algo.cancel();
+
+        // Run algo specific view initialization
+        prepareView();
     }
 
     /**
