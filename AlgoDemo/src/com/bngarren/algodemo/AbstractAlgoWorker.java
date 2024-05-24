@@ -59,6 +59,28 @@ public abstract class AbstractAlgoWorker<T, V, C extends IAlgoController<?>> ext
      */
     protected abstract void processChunk(V chunk);
 
+
+    /**
+     * Called on the EDT when doInBackground() completes
+     */
+    @Override
+    protected void done() {
+        try {
+            T result = get();
+            onAlgorithmComplete(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Method to be implemented by subclasses to handle the final result
+     *
+     * @param result The final result of the algorithm
+     */
+    protected abstract void onAlgorithmComplete(T result);
+
+    
     /**
      * Releases a permit so that if the worker thread (runAlgorithm() via doInBackground()) is waiting it may continue
      */

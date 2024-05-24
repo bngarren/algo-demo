@@ -4,6 +4,7 @@ import com.bngarren.algodemo.AbstractAlgoWorker;
 import com.bngarren.algodemo.AbstractAlgorithm;
 import com.bngarren.algodemo.grid.Cell;
 import com.bngarren.algodemo.util.GridLocation;
+import com.bngarren.algodemo.util.GridOps;
 import com.bngarren.algodemo.util.IGridLocation;
 
 import java.awt.*;
@@ -26,22 +27,6 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
         return new Worker(controller);
     }
 
-    private static List<Cell> getNeighbors(IGridLocation current, Map<IGridLocation, Cell> cells) {
-
-        List<Cell> result = new ArrayList<>();
-        int[][] mvmts = new int[][]{{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
-
-        for (int[] mvmt : mvmts) {
-            GridLocation next = new GridLocation(current.row() + mvmt[0], current.col() + mvmt[1]);
-            if (cells.containsKey(next)) {
-                Cell neighbor = cells.get(next);
-                if (neighbor.isTraversable()) {
-                    result.add(neighbor);
-                }
-            }
-        }
-        return result;
-    }
 
     public record WorkerPacket(IGridLocation current, List<IGridLocation> neighbors, List<IGridLocation> visited,
                                List<IGridLocation> queue) {
@@ -69,7 +54,7 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
                 IGridLocation current = queue.poll();
                 result.add(current);
 
-                List<Cell> neighbors = getNeighbors(current, cells);
+                List<Cell> neighbors = GridOps.getNeighbors(current, cells);
                 List<IGridLocation> neighborLocations = new ArrayList<>();
 
                 for (Cell neighbor : neighbors) {
@@ -91,6 +76,11 @@ public class BFS extends AbstractAlgorithm<BFS.Worker, BFSController> {
             }
 
             return result;
+        }
+
+        @Override
+        protected void onAlgorithmComplete(List<IGridLocation> result) {
+            
         }
 
         @Override

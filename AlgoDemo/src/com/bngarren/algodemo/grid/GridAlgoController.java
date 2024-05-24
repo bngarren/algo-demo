@@ -73,7 +73,7 @@ public abstract class GridAlgoController<C extends Cell> extends AbstractAlgoCon
         selectedGridLocation.getCurrent().ifPresentOrElse(selected -> {
             @SuppressWarnings("StringBufferReplaceableByString")
             StringBuilder sb = new StringBuilder();
-            sb.append(selected);
+            sb.append(getView().getCellButton(selected.row(), selected.col()).getText());
             view.setCellDescriptionText(sb.toString());
         }, () -> {
             view.setCellDescriptionText("");
@@ -89,6 +89,7 @@ public abstract class GridAlgoController<C extends Cell> extends AbstractAlgoCon
             return;
         }
         updater.accept(cellButton);
+        updateView();
     }
 
     /**
